@@ -50,6 +50,7 @@ class Ads {
     this.events = {};
     this.safetyTimer = null;
     this.countdownTimer = null;
+    this.showSkipButton = false;
 
     // Setup a promise to resolve when the IMA manager is ready
     this.managerPromise = new Promise((resolve, reject) => {
@@ -271,9 +272,34 @@ class Ads {
       this.manager.addEventListener(google.ima.AdEvent.Type[type], (e) => this.onAdEvent(e));
     });
 
+    if (this.player.config.ads.skipEnable) {
+      this.addSkipButton();
+    }
+
     // Resolve our adsManager
     this.trigger('loaded');
   };
+
+  addSkipButton = () => {
+     const skipButton = document.getElementById(this.player.config.ads.skipButtonId);
+
+    this.manager.addEventListener(
+      google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED,
+      () => {
+        // Show custom skip button after 5 seconds
+        setTimeout(() => {
+          skipButton.style.display = "block";
+        }, this.player.config.ads.showSkipButtonAfterSecond || 5000); // Adjust time as needed
+      }
+    );
+
+    // Handle skip button click
+    skipButton.addEventListener("click", () => {
+      this.manager.stop();
+      skipButton.style.display = "none";
+      // Resume your content here
+    });
+  }
 
   addCuePoints = () => {
     // Add advertisement cue's within the time line if available
