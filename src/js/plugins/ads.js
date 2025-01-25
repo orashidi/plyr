@@ -293,6 +293,13 @@ class Ads {
       }
     );
 
+    this.manager.addEventListener(
+      google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED,
+      () => {
+        skipButton.style.display = "none";
+      }
+    );
+
     // Handle skip button click
     skipButton.addEventListener("click", () => {
       this.manager.stop();
